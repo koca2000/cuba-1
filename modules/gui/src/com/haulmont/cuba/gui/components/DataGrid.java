@@ -1514,19 +1514,7 @@ public interface DataGrid<E extends Entity> extends ListComponent<E>, HasButtons
     /**
      * A renderer for presenting number values.
      */
-    interface NumberRenderer extends Renderer, HasNullRepresentation {
-        /**
-         * @return the locale which is used to present numbers
-         */
-        Locale getLocale();
-
-        /**
-         * Sets the locale in which to present numbers.
-         *
-         * @param locale the locale in which to present numbers
-         */
-        void setLocale(Locale locale);
-
+    interface NumberRenderer extends Renderer, HasNullRepresentation, HasLocale {
         /**
          * @return the format string with which is used to format the number
          */
