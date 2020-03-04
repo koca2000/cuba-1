@@ -61,17 +61,17 @@ import java.util.stream.Stream;
 
 public abstract class AbstractDataGridLoader<T extends DataGrid> extends ActionsHolderLoader<T> {
 
-    protected static final List<String> UNSUPPORTED_DECLARATIVE_RENDERERS = ImmutableList.of(
-            "com.haulmont.cuba.gui.components.DataGrid$ButtonRenderer",
-            "com.haulmont.cuba.gui.components.DataGrid$ClickableTextRenderer",
-            "com.haulmont.cuba.gui.components.DataGrid$ImageRenderer"
+    protected static final List<Class<?>> UNSUPPORTED_DECLARATIVE_RENDERERS = ImmutableList.of(
+            DataGrid.ButtonRenderer.class,
+            DataGrid.ClickableTextRenderer.class,
+            DataGrid.ImageRenderer.class
     );
 
-    protected static final List<String> UNSUPPORTED_PARAMETERIZED_RENDERERS = ImmutableList.of(
-            "com.haulmont.cuba.gui.components.DataGrid$DateRenderer",
-            "com.haulmont.cuba.gui.components.DataGrid$LocalDateRenderer",
-            "com.haulmont.cuba.gui.components.DataGrid$LocalDateTimeRenderer",
-            "com.haulmont.cuba.gui.components.DataGrid$NumberRenderer"
+    protected static final List<Class<?>> UNSUPPORTED_PARAMETERIZED_RENDERERS = ImmutableList.of(
+            DataGrid.DateRenderer.class,
+            DataGrid.LocalDateRenderer.class,
+            DataGrid.LocalDateTimeRenderer.class,
+            DataGrid.NumberRenderer.class
     );
 
     private static final Logger log = LoggerFactory.getLogger(AbstractDataGridLoader.class);
@@ -582,67 +582,67 @@ public abstract class AbstractDataGridLoader<T extends DataGrid> extends Actions
     protected DataGrid.Renderer loadRenderer(Element columnElement) {
         Element rendererElement = columnElement.element("checkBoxRenderer");
         if (rendererElement != null) {
-            return loadRendererByClass(DataGrid.CheckBoxRenderer.class);
+            return loadRendererByClass(rendererElement, DataGrid.CheckBoxRenderer.class);
         }
 
         rendererElement = columnElement.element("componentRenderer");
         if (rendererElement != null) {
-            return loadRendererByClass(DataGrid.ComponentRenderer.class);
+            return loadRendererByClass(rendererElement, DataGrid.ComponentRenderer.class);
         }
 
         rendererElement = columnElement.element("iconRenderer");
         if (rendererElement != null) {
-            return loadRendererByClass(DataGrid.IconRenderer.class);
+            return loadRendererByClass(rendererElement, DataGrid.IconRenderer.class);
         }
 
         rendererElement = columnElement.element("imageRenderer");
         if (rendererElement != null) {
-            return loadRendererByClass(DataGrid.ImageRenderer.class);
+            return loadRendererByClass(rendererElement, DataGrid.ImageRenderer.class);
         }
 
         rendererElement = columnElement.element("progressBarRenderer");
         if (rendererElement != null) {
-            return loadRendererByClass(DataGrid.ProgressBarRenderer.class);
+            return loadRendererByClass(rendererElement, DataGrid.ProgressBarRenderer.class);
         }
 
         rendererElement = columnElement.element("buttonRenderer");
         if (rendererElement != null) {
-            return loadButtonRenderer(rendererElement);
+            return loadRendererByClass(rendererElement, DataGrid.ButtonRenderer.class);
         }
 
         rendererElement = columnElement.element("clickableTextRenderer");
         if (rendererElement != null) {
-            return loadClickableTextRenderer(rendererElement);
+            return loadRendererByClass(rendererElement, DataGrid.ClickableTextRenderer.class);
         }
 
         rendererElement = columnElement.element("htmlRenderer");
         if (rendererElement != null) {
-            return loadHtmlRenderer(rendererElement);
+            return loadRendererByClass(rendererElement, DataGrid.HtmlRenderer.class);
         }
 
         rendererElement = columnElement.element("textRenderer");
         if (rendererElement != null) {
-            return loadTextRenderer(rendererElement);
+            return loadRendererByClass(rendererElement, DataGrid.TextRenderer.class);
         }
 
         rendererElement = columnElement.element("dateRenderer");
         if (rendererElement != null) {
-            return loadDateRenderer(rendererElement);
+            return loadRendererByClass(rendererElement, DataGrid.DateRenderer.class);
         }
 
         rendererElement = columnElement.element("localDateRenderer");
         if (rendererElement != null) {
-            return loadLocalDateRenderer(rendererElement);
+            return loadRendererByClass(rendererElement, DataGrid.LocalDateRenderer.class);
         }
 
         rendererElement = columnElement.element("localDateTimeRenderer");
         if (rendererElement != null) {
-            return loadLocalDateTimeRenderer(rendererElement);
+            return loadRendererByClass(rendererElement, DataGrid.LocalDateTimeRenderer.class);
         }
 
         rendererElement = columnElement.element("numberRenderer");
         if (rendererElement != null) {
-            return loadNumberRenderer(rendererElement);
+            return loadRendererByClass(rendererElement, DataGrid.NumberRenderer.class);
         }
 
         rendererElement = columnElement.element("renderer");
@@ -654,134 +654,38 @@ public abstract class AbstractDataGridLoader<T extends DataGrid> extends Actions
     }
 
     @SuppressWarnings("rawtypes")
-    protected DataGrid.Renderer loadRendererByClass(Class rendererClass) {
-        return resultComponent.createRenderer(rendererClass);
-    }
+    protected DataGrid.Renderer loadRendererByClass(Element rendererElement, Class rendererClass) {
+        DataGrid.Renderer renderer = resultComponent.createRenderer(rendererClass);
 
-    @SuppressWarnings("rawtypes")
-    @Nullable
-    protected DataGrid.Renderer loadButtonRenderer(Element rendererElement) {
-        DataGrid.ButtonRenderer buttonRenderer =
-                (DataGrid.ButtonRenderer) resultComponent.createRenderer(DataGrid.ButtonRenderer.class);
-
-        String nullRepresentation = loadNullRepresentation(rendererElement);
-        if (nullRepresentation != null) {
-            buttonRenderer.setNullRepresentation(nullRepresentation);
+        if (renderer instanceof DataGrid.HasNullRepresentation) {
+            String nullRepresentation = loadNullRepresentation(rendererElement);
+            if (nullRepresentation != null) {
+                ((DataGrid.HasNullRepresentation) renderer).setNullRepresentation(nullRepresentation);
+            }
         }
 
-        return buttonRenderer;
-    }
-
-    @SuppressWarnings("rawtypes")
-    @Nullable
-    protected DataGrid.Renderer loadClickableTextRenderer(Element rendererElement) {
-        DataGrid.ClickableTextRenderer clickableTextRenderer =
-                (DataGrid.ClickableTextRenderer) resultComponent.createRenderer(DataGrid.ClickableTextRenderer.class);
-
-        String nullRepresentation = loadNullRepresentation(rendererElement);
-        if (nullRepresentation != null) {
-            clickableTextRenderer.setNullRepresentation(nullRepresentation);
+        if (renderer instanceof DataGrid.HasDateTimeFormatter) {
+            String formatPattern = loadFormat(rendererElement);
+            if (formatPattern != null) {
+                ((DataGrid.HasDateTimeFormatter) renderer).setFormatPattern(formatPattern);
+            }
         }
 
-        return clickableTextRenderer;
-    }
-
-    @Nullable
-    protected DataGrid.Renderer loadHtmlRenderer(Element rendererElement) {
-        DataGrid.HtmlRenderer htmlRenderer =
-                (DataGrid.HtmlRenderer) resultComponent.createRenderer(DataGrid.HtmlRenderer.class);
-
-        String nullRepresentation = loadNullRepresentation(rendererElement);
-        if (nullRepresentation != null) {
-            htmlRenderer.setNullRepresentation(nullRepresentation);
+        if (renderer instanceof DataGrid.DateRenderer) {
+            String formatString = loadFormat(rendererElement);
+            if (formatString != null) {
+                ((DataGrid.DateRenderer) renderer).setFormatString(formatString);
+            }
         }
 
-        return htmlRenderer;
-    }
-
-    @Nullable
-    protected DataGrid.Renderer loadTextRenderer(Element rendererElement) {
-        DataGrid.TextRenderer textRenderer =
-                (DataGrid.TextRenderer) resultComponent.createRenderer(DataGrid.TextRenderer.class);
-
-        String nullRepresentation = loadNullRepresentation(rendererElement);
-        if (nullRepresentation != null) {
-            textRenderer.setNullRepresentation(nullRepresentation);
+        if (renderer instanceof DataGrid.NumberRenderer) {
+            String formatString = loadFormat(rendererElement);
+            if (formatString != null) {
+                ((DataGrid.NumberRenderer) renderer).setFormatString(formatString);
+            }
         }
 
-        return textRenderer;
-    }
-
-    @Nullable
-    protected DataGrid.Renderer loadDateRenderer(Element rendererElement) {
-        DataGrid.DateRenderer dateRenderer =
-                (DataGrid.DateRenderer) resultComponent.createRenderer(DataGrid.DateRenderer.class);
-
-        String nullRepresentation = loadNullRepresentation(rendererElement);
-        if (nullRepresentation != null) {
-            dateRenderer.setNullRepresentation(nullRepresentation);
-        }
-
-        String format = loadFormat(rendererElement);
-        if (format != null) {
-            dateRenderer.setFormatString(format);
-        }
-
-        return dateRenderer;
-    }
-
-    @Nullable
-    protected DataGrid.Renderer loadLocalDateRenderer(Element rendererElement) {
-        DataGrid.LocalDateRenderer localDateRenderer =
-                (DataGrid.LocalDateRenderer) resultComponent.createRenderer(DataGrid.LocalDateRenderer.class);
-
-        String nullRepresentation = loadNullRepresentation(rendererElement);
-        if (nullRepresentation != null) {
-            localDateRenderer.setNullRepresentation(nullRepresentation);
-        }
-
-        String format = loadFormat(rendererElement);
-        if (format != null) {
-            localDateRenderer.setFormatPattern(format);
-        }
-
-        return localDateRenderer;
-    }
-
-    @Nullable
-    protected DataGrid.Renderer loadLocalDateTimeRenderer(Element rendererElement) {
-        DataGrid.LocalDateTimeRenderer localDateTimeRenderer =
-                (DataGrid.LocalDateTimeRenderer) resultComponent.createRenderer(DataGrid.LocalDateTimeRenderer.class);
-
-        String nullRepresentation = loadNullRepresentation(rendererElement);
-        if (nullRepresentation != null) {
-            localDateTimeRenderer.setNullRepresentation(nullRepresentation);
-        }
-
-        String format = loadFormat(rendererElement);
-        if (format != null) {
-            localDateTimeRenderer.setFormatPattern(format);
-        }
-
-        return localDateTimeRenderer;
-    }
-
-    @Nullable
-    protected DataGrid.Renderer loadNumberRenderer(Element rendererElement) {
-        DataGrid.NumberRenderer numberRenderer =
-                (DataGrid.NumberRenderer) resultComponent.createRenderer(DataGrid.NumberRenderer.class);
-
-        String nullRepresentation = loadNullRepresentation(rendererElement);
-        if (nullRepresentation != null) {
-            numberRenderer.setNullRepresentation(nullRepresentation);
-        }
-
-        String formatString = loadFormat(rendererElement);
-        if (formatString != null) {
-            numberRenderer.setFormatString(formatString);
-        }
-
-        return numberRenderer;
+        return renderer;
     }
 
     @Nullable
@@ -791,21 +695,21 @@ public abstract class AbstractDataGridLoader<T extends DataGrid> extends Actions
             return null;
         }
 
-        if (UNSUPPORTED_PARAMETERIZED_RENDERERS.contains(rendererType)) {
+        Class<?> rendererClass = getScripting().loadClassNN(rendererType);
+
+        if (UNSUPPORTED_PARAMETERIZED_RENDERERS.contains(rendererClass)) {
             throw new GuiDevelopmentException(String.format(
                     "DataGrid doesn't support renderer of type '%s' without required parameters. " +
                             "Use special XML elements for parameterized renderers.",
                     rendererType), context);
         }
 
-        if (UNSUPPORTED_DECLARATIVE_RENDERERS.contains(rendererType)) {
+        if (UNSUPPORTED_DECLARATIVE_RENDERERS.contains(rendererClass)) {
             throw new GuiDevelopmentException(String.format(
                     "DataGrid doesn't support declarative configuration of renderer of type '%s'. " +
                             "Define it in screen controller.",
                     rendererType), context);
         }
-
-        Class<?> rendererClass = getScripting().loadClassNN(rendererType);
 
         return resultComponent.createRenderer(rendererClass);
     }

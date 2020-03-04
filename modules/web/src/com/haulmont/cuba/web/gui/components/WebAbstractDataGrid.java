@@ -102,7 +102,6 @@ import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import java.beans.PropertyChangeEvent;
@@ -763,7 +762,7 @@ public abstract class WebAbstractDataGrid<C extends Grid<E> & CubaEnhancedGrid<E
             addColumnId(gridColumn, column);
         }
 
-        com.vaadin.ui.renderers.Renderer columnRenderer = getColumnRenderer(column);
+        com.vaadin.ui.renderers.Renderer columnRenderer = getColumnRendererImplementation(column);
         if (!Objects.equals(gridColumn.getRenderer(), columnRenderer)) {
             gridColumn.setRenderer(getColumnPresentationValueProvider(column), columnRenderer);
         }
@@ -775,7 +774,7 @@ public abstract class WebAbstractDataGrid<C extends Grid<E> & CubaEnhancedGrid<E
         ((ColumnImpl<E>) column).setGridColumn(gridColumn);
     }
 
-    protected ValueProvider getColumnPresentationValueProvider(@Nonnull Column<E> column) {
+    protected ValueProvider getColumnPresentationValueProvider(Column<E> column) {
         Function presentationProvider = column.getPresentationProvider();
         Converter converter = column.getConverter();
         Function<?, String> formatter = column.getFormatter();
@@ -820,7 +819,7 @@ public abstract class WebAbstractDataGrid<C extends Grid<E> & CubaEnhancedGrid<E
         return new StringPresentationValueProvider(metaProperty, metadataTools);
     }
 
-    protected com.vaadin.ui.renderers.Renderer getColumnRenderer(@Nonnull Column<E> column) {
+    protected com.vaadin.ui.renderers.Renderer getColumnRendererImplementation(Column<E> column) {
         Renderer renderer = column.getRenderer();
         return renderer != null
                 ? ((AbstractRenderer) renderer).getImplementation()
@@ -3947,7 +3946,7 @@ public abstract class WebAbstractDataGrid<C extends Grid<E> & CubaEnhancedGrid<E
         @SuppressWarnings("unchecked")
         protected void updateRendererInternal() {
             if (gridColumn != null) {
-                com.vaadin.ui.renderers.Renderer vRenderer = owner.getColumnRenderer(this);
+                com.vaadin.ui.renderers.Renderer vRenderer = owner.getColumnRendererImplementation(this);
                 ValueProvider vPresentationProvider = owner.getColumnPresentationValueProvider(this);
                 gridColumn.setRenderer(vPresentationProvider, vRenderer);
                 owner.repaint();

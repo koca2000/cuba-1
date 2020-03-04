@@ -1314,23 +1314,23 @@
         <xs:attribute name="useUserTimezone" type="xs:boolean"/>
     </xs:complexType>
 
-    <xs:complexType name="nullRepresentationType">
+    <xs:complexType name="rendererType">
         <xs:attribute name="nullRepresentation" type="xs:string"/>
     </xs:complexType>
 
-    <xs:complexType name="formatRendererType">
+    <xs:complexType name="formattableRendererType">
         <xs:complexContent>
-            <xs:extension base="nullRepresentationType">
+            <xs:extension base="rendererType">
                 <xs:attribute name="format" type="xs:string" use="required"/>
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
 
-    <xs:complexType name="rendererType">
-        <xs:attribute name="type" type="rendererTypes" use="required"/>
+    <xs:complexType name="rendererListType">
+        <xs:attribute name="type" type="rendererList" use="required"/>
     </xs:complexType>
 
-    <xs:simpleType name="rendererTypes">
+    <xs:simpleType name="rendererList">
         <xs:restriction base="xs:string">
             <xs:enumeration value="com.haulmont.cuba.gui.components.DataGrid$CheckBoxRenderer"/>
             <xs:enumeration value="com.haulmont.cuba.gui.components.DataGrid$ComponentRenderer"/>
@@ -1348,13 +1348,13 @@
                 <xs:element name="componentRenderer" minOccurs="0"/>
                 <xs:element name="iconRenderer" minOccurs="0"/>
                 <xs:element name="progressBarRenderer" minOccurs="0"/>
-                <xs:element name="htmlRenderer" minOccurs="0" type="nullRepresentationType"/>
-                <xs:element name="textRenderer" minOccurs="0" type="nullRepresentationType"/>
-                <xs:element name="dateRenderer" minOccurs="0" type="formatRendererType"/>
-                <xs:element name="localDateRenderer" minOccurs="0" type="formatRendererType"/>
-                <xs:element name="localDateTimeRenderer" minOccurs="0" type="formatRendererType"/>
-                <xs:element name="numberRenderer" minOccurs="0" type="formatRendererType"/>
-                <xs:element name="renderer" minOccurs="0" type="rendererType"/>
+                <xs:element name="htmlRenderer" minOccurs="0" type="rendererType"/>
+                <xs:element name="textRenderer" minOccurs="0" type="rendererType"/>
+                <xs:element name="dateRenderer" minOccurs="0" type="formattableRendererType"/>
+                <xs:element name="localDateRenderer" minOccurs="0" type="formattableRendererType"/>
+                <xs:element name="localDateTimeRenderer" minOccurs="0" type="formattableRendererType"/>
+                <xs:element name="numberRenderer" minOccurs="0" type="formattableRendererType"/>
+                <xs:element name="renderer" minOccurs="0" type="rendererListType"/>
             </xs:choice>
         </xs:sequence>
     </xs:group>
