@@ -19,6 +19,7 @@ package com.haulmont.cuba.gui.xml.layout.loaders;
 import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.haulmont.chile.core.model.MetaClass;
 import com.haulmont.chile.core.model.MetaProperty;
 import com.haulmont.chile.core.model.MetaPropertyPath;
@@ -73,6 +74,20 @@ public abstract class AbstractDataGridLoader<T extends DataGrid> extends Actions
             DataGrid.LocalDateTimeRenderer.class,
             DataGrid.NumberRenderer.class
     );
+
+    protected static final Map<String, Class<?>> RENDERERS_MAP =
+            ImmutableMap.<String, Class<?>>builder()
+                    .put("checkBoxRenderer", DataGrid.CheckBoxRenderer.class)
+                    .put("componentRenderer", DataGrid.ComponentRenderer.class)
+                    .put("dateRenderer", DataGrid.DateRenderer.class)
+                    .put("iconRenderer", DataGrid.IconRenderer.class)
+                    .put("htmlRenderer", DataGrid.HtmlRenderer.class)
+                    .put("localDateRenderer", DataGrid.LocalDateRenderer.class)
+                    .put("localDateTimeRenderer", DataGrid.LocalDateTimeRenderer.class)
+                    .put("numberRenderer", DataGrid.NumberRenderer.class)
+                    .put("progressBarRenderer", DataGrid.ProgressBarRenderer.class)
+                    .put("textRenderer", DataGrid.TextRenderer.class)
+                    .build();
 
     private static final Logger log = LoggerFactory.getLogger(AbstractDataGridLoader.class);
 
@@ -580,69 +595,13 @@ public abstract class AbstractDataGridLoader<T extends DataGrid> extends Actions
 
     @Nullable
     protected DataGrid.Renderer loadRenderer(Element columnElement) {
-        Element rendererElement = columnElement.element("checkBoxRenderer");
-        if (rendererElement != null) {
-            return loadRendererByClass(rendererElement, DataGrid.CheckBoxRenderer.class);
-        }
+        Element rendererElement;
 
-        rendererElement = columnElement.element("componentRenderer");
-        if (rendererElement != null) {
-            return loadRendererByClass(rendererElement, DataGrid.ComponentRenderer.class);
-        }
-
-        rendererElement = columnElement.element("iconRenderer");
-        if (rendererElement != null) {
-            return loadRendererByClass(rendererElement, DataGrid.IconRenderer.class);
-        }
-
-        rendererElement = columnElement.element("imageRenderer");
-        if (rendererElement != null) {
-            return loadRendererByClass(rendererElement, DataGrid.ImageRenderer.class);
-        }
-
-        rendererElement = columnElement.element("progressBarRenderer");
-        if (rendererElement != null) {
-            return loadRendererByClass(rendererElement, DataGrid.ProgressBarRenderer.class);
-        }
-
-        rendererElement = columnElement.element("buttonRenderer");
-        if (rendererElement != null) {
-            return loadRendererByClass(rendererElement, DataGrid.ButtonRenderer.class);
-        }
-
-        rendererElement = columnElement.element("clickableTextRenderer");
-        if (rendererElement != null) {
-            return loadRendererByClass(rendererElement, DataGrid.ClickableTextRenderer.class);
-        }
-
-        rendererElement = columnElement.element("htmlRenderer");
-        if (rendererElement != null) {
-            return loadRendererByClass(rendererElement, DataGrid.HtmlRenderer.class);
-        }
-
-        rendererElement = columnElement.element("textRenderer");
-        if (rendererElement != null) {
-            return loadRendererByClass(rendererElement, DataGrid.TextRenderer.class);
-        }
-
-        rendererElement = columnElement.element("dateRenderer");
-        if (rendererElement != null) {
-            return loadRendererByClass(rendererElement, DataGrid.DateRenderer.class);
-        }
-
-        rendererElement = columnElement.element("localDateRenderer");
-        if (rendererElement != null) {
-            return loadRendererByClass(rendererElement, DataGrid.LocalDateRenderer.class);
-        }
-
-        rendererElement = columnElement.element("localDateTimeRenderer");
-        if (rendererElement != null) {
-            return loadRendererByClass(rendererElement, DataGrid.LocalDateTimeRenderer.class);
-        }
-
-        rendererElement = columnElement.element("numberRenderer");
-        if (rendererElement != null) {
-            return loadRendererByClass(rendererElement, DataGrid.NumberRenderer.class);
+        for (Map.Entry<String, Class<?>> entry : RENDERERS_MAP.entrySet()) {
+            rendererElement = columnElement.element(entry.getKey());
+            if (rendererElement != null) {
+                return loadRendererByClass(rendererElement, entry.getValue());
+            }
         }
 
         rendererElement = columnElement.element("renderer");

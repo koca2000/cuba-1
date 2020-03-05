@@ -1343,7 +1343,7 @@
 
     <xs:group name="renderers">
         <xs:sequence>
-            <xs:choice>
+            <xs:choice maxOccurs="1">
                 <xs:element name="checkBoxRenderer" minOccurs="0"/>
                 <xs:element name="componentRenderer" minOccurs="0"/>
                 <xs:element name="iconRenderer" minOccurs="0"/>
