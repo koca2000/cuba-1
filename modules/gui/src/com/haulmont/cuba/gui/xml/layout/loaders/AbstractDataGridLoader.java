@@ -617,31 +617,15 @@ public abstract class AbstractDataGridLoader<T extends DataGrid> extends Actions
         DataGrid.Renderer renderer = resultComponent.createRenderer(rendererClass);
 
         if (renderer instanceof DataGrid.HasNullRepresentation) {
-            String nullRepresentation = loadNullRepresentation(rendererElement);
-            if (nullRepresentation != null) {
-                ((DataGrid.HasNullRepresentation) renderer).setNullRepresentation(nullRepresentation);
-            }
+            loadNullRepresentation(rendererElement, (DataGrid.HasNullRepresentation) renderer);
         }
 
         if (renderer instanceof DataGrid.HasDateTimeFormatter) {
-            String formatPattern = loadFormat(rendererElement);
-            if (formatPattern != null) {
-                ((DataGrid.HasDateTimeFormatter) renderer).setFormatPattern(formatPattern);
-            }
+            loadFormatPattern(rendererElement, (DataGrid.HasDateTimeFormatter) renderer);
         }
 
-        if (renderer instanceof DataGrid.DateRenderer) {
-            String formatString = loadFormat(rendererElement);
-            if (formatString != null) {
-                ((DataGrid.DateRenderer) renderer).setFormatString(formatString);
-            }
-        }
-
-        if (renderer instanceof DataGrid.NumberRenderer) {
-            String formatString = loadFormat(rendererElement);
-            if (formatString != null) {
-                ((DataGrid.NumberRenderer) renderer).setFormatString(formatString);
-            }
+        if (renderer instanceof DataGrid.HasFormatString) {
+            loadFormatString(rendererElement, (DataGrid.HasFormatString) renderer);
         }
 
         return renderer;
@@ -673,22 +657,25 @@ public abstract class AbstractDataGridLoader<T extends DataGrid> extends Actions
         return resultComponent.createRenderer(rendererClass);
     }
 
-    @Nullable
-    protected String loadNullRepresentation(Element rendererElement) {
+    protected void loadNullRepresentation(Element rendererElement, DataGrid.HasNullRepresentation renderer) {
         String nullRepresentation = rendererElement.attributeValue("nullRepresentation");
-
-        return StringUtils.isNotEmpty(nullRepresentation)
-                ? nullRepresentation
-                : null;
+        if (StringUtils.isNotEmpty(nullRepresentation)) {
+            renderer.setNullRepresentation(nullRepresentation);
+        }
     }
 
-    @Nullable
-    protected String loadFormat(Element rendererElement) {
-        String formatString = rendererElement.attributeValue("format");
+    protected void loadFormatPattern(Element rendererElement, DataGrid.HasDateTimeFormatter renderer) {
+        String formatPattern = rendererElement.attributeValue("format");
+        if (StringUtils.isNotEmpty(formatPattern)) {
+            renderer.setFormatPattern(formatPattern);
+        }
+    }
 
-        return StringUtils.isNotEmpty(formatString)
-                ? formatString
-                : null;
+    protected void loadFormatString(Element rendererElement, DataGrid.HasFormatString renderer) {
+        String formatString = rendererElement.attributeValue("format");
+        if (StringUtils.isNotEmpty(formatString)) {
+            renderer.setFormatString(formatString);
+        }
     }
 
     @Nullable

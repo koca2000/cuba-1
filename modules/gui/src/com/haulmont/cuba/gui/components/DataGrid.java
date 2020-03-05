@@ -1387,6 +1387,21 @@ public interface DataGrid<E extends Entity> extends ListComponent<E>, HasButtons
     }
 
     /**
+     * A renderer has a format string.
+     */
+    interface HasFormatString {
+        /**
+         * @return the format string describing the value format
+         */
+        String getFormatString();
+
+        /**
+         * @param formatString the format string describing the value format
+         */
+        void setFormatString(String formatString);
+    }
+
+    /**
      * Click event fired by a {@link HasRendererClickListener}
      */
     class RendererClickEvent<T extends Entity> extends DataGridClickEvent {
@@ -1474,20 +1489,7 @@ public interface DataGrid<E extends Entity> extends ListComponent<E>, HasButtons
     /**
      * A renderer for presenting date values.
      */
-    interface DateRenderer extends Renderer, HasNullRepresentation, HasLocale {
-        /**
-         * @return the pattern describing the date and time format
-         */
-        String getFormatString();
-
-        /**
-         * @param formatString the pattern describing the date and time format
-         *                     which will be used to create {@link DateFormat} instance.
-         * @see <a href="https://docs.oracle.com/javase/tutorial/i18n/format/simpleDateFormat.html">Format
-         * String Syntax</a>
-         */
-        void setFormatString(String formatString);
-
+    interface DateRenderer extends Renderer, HasNullRepresentation, HasLocale, HasFormatString {
         /**
          * @return the instance of {@link DateFormat} which is used to present dates
          */
@@ -1514,19 +1516,7 @@ public interface DataGrid<E extends Entity> extends ListComponent<E>, HasButtons
     /**
      * A renderer for presenting number values.
      */
-    interface NumberRenderer extends Renderer, HasNullRepresentation, HasLocale {
-        /**
-         * @return the format string with which is used to format the number
-         */
-        String getFormatString();
-
-        /**
-         * @param formatString the format string with which to format the number
-         * @see <a href=
-         * "http://docs.oracle.com/javase/8/docs/api/java/util/Formatter.html#dnum">Format String Syntax</a>
-         */
-        void setFormatString(String formatString);
-
+    interface NumberRenderer extends Renderer, HasNullRepresentation, HasLocale, HasFormatString {
         /**
          * @return the instance of {@link NumberFormat} which is used to present numbers
          */
