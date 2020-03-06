@@ -1491,6 +1491,24 @@ public interface DataGrid<E extends Entity> extends ListComponent<E>, HasButtons
      */
     interface DateRenderer extends Renderer, HasNullRepresentation, HasLocale, HasFormatString {
         /**
+         * {@inheritDoc}
+         *
+         * @return the format string describing the date and time format
+         */
+        @Override
+        String getFormatString();
+
+        /**
+         * {@inheritDoc}
+         *
+         * @param formatString the format string describing the date and time format
+         *                     which will be used to create {@link DateFormat} instance.
+         * @see <a href="https://docs.oracle.com/javase/tutorial/i18n/format/simpleDateFormat.html">Format String Syntax</a>
+         */
+        @Override
+        void setFormatString(String formatString);
+
+        /**
          * @return the instance of {@link DateFormat} which is used to present dates
          */
         DateFormat getDateFormat();
@@ -1517,6 +1535,24 @@ public interface DataGrid<E extends Entity> extends ListComponent<E>, HasButtons
      * A renderer for presenting number values.
      */
     interface NumberRenderer extends Renderer, HasNullRepresentation, HasLocale, HasFormatString {
+        /**
+         * {@inheritDoc}
+         *
+         * @return the format string describing the number format
+         */
+        @Override
+        String getFormatString();
+
+        /**
+         * {@inheritDoc}
+         *
+         * @param formatString the format string describing the number format
+         *                     which will be used to create {@link NumberFormat} instance.
+         * @see <a href="http://docs.oracle.com/javase/8/docs/api/java/util/Formatter.html#dnum">Format String Syntax</a>
+         */
+        @Override
+        void setFormatString(String formatString);
+
         /**
          * @return the instance of {@link NumberFormat} which is used to present numbers
          */
