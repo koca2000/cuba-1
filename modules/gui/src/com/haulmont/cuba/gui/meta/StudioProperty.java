@@ -60,7 +60,9 @@ public @interface StudioProperty {
     String defaultValue() default "";
 
     /**
-     * @return enumeration options
+     * Enumeration options for {@link PropertyType#ENUMERATION} property, or
+     * list of Spring bean base classes for {@link PropertyType#BEAN_REF} property
+     * @return options
      */
     String[] options() default {};
 
