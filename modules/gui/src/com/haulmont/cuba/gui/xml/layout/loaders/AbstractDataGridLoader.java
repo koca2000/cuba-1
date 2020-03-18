@@ -66,6 +66,7 @@ public abstract class AbstractDataGridLoader<T extends DataGrid> extends Actions
     protected Element panelElement;
 
     protected String sortedColumnId;
+    protected DataGrid.SortDirection sortDirection;
 
     @Override
     public void createComponent() {
@@ -212,6 +213,23 @@ public abstract class AbstractDataGridLoader<T extends DataGrid> extends Actions
         loadSelectionMode(resultComponent, element);
         loadFrozenColumnCount(resultComponent, element);
         loadTabIndex(resultComponent, element);
+
+        if (collectionContainer instanceof CollectionPropertyContainer) {
+            InstanceContainer masterContainer = ((CollectionPropertyContainer) collectionContainer).getMaster();
+            while (masterContainer instanceof Nested) {
+                masterContainer = ((Nested) masterContainer).getMaster();
+            }
+
+            if (masterContainer instanceof HasLoader) {
+                DataLoader masterDataLoader = ((HasLoader) masterContainer).getLoader();
+
+                if (masterDataLoader instanceof InstanceLoader) {
+                    ((InstanceLoader) masterDataLoader).addPostLoadListener(postLoadEvent -> setColumnSort());
+                } else if (masterDataLoader instanceof CollectionLoader) {
+                    ((CollectionLoader) masterDataLoader).addPostLoadListener(postLoadEvent -> setColumnSort());
+                }
+            }
+        }
     }
 
     protected Scripting getScripting() {
@@ -755,11 +773,15 @@ public abstract class AbstractDataGridLoader<T extends DataGrid> extends Actions
                     getContext());
         }
 
-        DataGrid.SortDirection sortDirection = DataGrid.SortDirection.valueOf(sort);
-        getComponentContext().addPostInitTask((context, window) ->
-                component.sort(column.getId(), sortDirection));
-
+        sortDirection = DataGrid.SortDirection.valueOf(sort);
         sortedColumnId = column.getId();
+        getComponentContext().addPostInitTask((context, window) -> setColumnSort());
+    }
+
+    protected void setColumnSort() {
+        if (sortedColumnId != null && sortDirection != null) {
+            resultComponent.sort(sortedColumnId, sortDirection);
+        }
     }
 
     protected void loadEmptyStateMessage(DataGrid dataGrid, Element element) {

@@ -71,6 +71,7 @@ public abstract class AbstractTableLoader<T extends Table> extends ActionsHolder
     protected Element panelElement;
 
     protected String sortedColumnId;
+    protected Table.SortDirection sortDirection;
 
     @Override
     public void loadComponent() {
@@ -239,6 +240,23 @@ public abstract class AbstractTableLoader<T extends Table> extends ActionsHolder
         String multiselect = element.attributeValue("multiselect");
         if (StringUtils.isNotEmpty(multiselect)) {
             resultComponent.setMultiSelect(Boolean.parseBoolean(multiselect));
+        }
+
+        if (collectionContainer instanceof CollectionPropertyContainer) {
+            InstanceContainer masterContainer = ((CollectionPropertyContainer) collectionContainer).getMaster();
+            while (masterContainer instanceof Nested) {
+                masterContainer = ((Nested) masterContainer).getMaster();
+            }
+
+            if (masterContainer instanceof HasLoader) {
+                DataLoader masterDataLoader = ((HasLoader) masterContainer).getLoader();
+
+                if (masterDataLoader instanceof InstanceLoader) {
+                    ((InstanceLoader) masterDataLoader).addPostLoadListener(postLoadEvent -> setColumnSort());
+                } else if (masterDataLoader instanceof CollectionLoader) {
+                    ((CollectionLoader) masterDataLoader).addPostLoadListener(postLoadEvent -> setColumnSort());
+                }
+            }
         }
     }
 
@@ -812,11 +830,15 @@ public abstract class AbstractTableLoader<T extends Table> extends ActionsHolder
                     getContext());
         }
 
-        Table.SortDirection sortDirection = Table.SortDirection.valueOf(sort);
-        getComponentContext().addPostInitTask((context, window) ->
-                resultComponent.sort(column.getStringId(), sortDirection));
-
+        sortDirection = Table.SortDirection.valueOf(sort);
         sortedColumnId = column.getStringId();
+        getComponentContext().addPostInitTask((context, window) -> setColumnSort());
+    }
+
+    protected void setColumnSort() {
+        if (sortedColumnId != null && sortDirection != null) {
+            resultComponent.sort(sortedColumnId, sortDirection);
+        }
     }
 
     protected void loadEmptyStateMessage(Table table, Element element) {
