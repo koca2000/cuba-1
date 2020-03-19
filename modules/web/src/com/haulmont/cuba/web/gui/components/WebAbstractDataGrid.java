@@ -1435,6 +1435,7 @@ public abstract class WebAbstractDataGrid<C extends Grid<E> & CubaEnhancedGrid<E
         }
         instanceContainer.setView(viewRepository.getView(metaClass, View.LOCAL));
         instanceContainer.setItem(item);
+        setSelected(item);
 
         itemDatasources.put(item, instanceContainer);
 
