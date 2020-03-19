@@ -20,8 +20,6 @@ import com.haulmont.chile.core.annotations.MetaClass;
 import com.haulmont.chile.core.annotations.MetaProperty;
 import com.haulmont.cuba.core.entity.BaseUuidEntity;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.Date;
 
 @MetaClass(name = "test_RendererEntity")
@@ -52,10 +50,10 @@ public class RendererEntity extends BaseUuidEntity {
     protected String html;
 
     @MetaProperty
-    protected LocalDate localDate;
+    protected String localDate;
 
     @MetaProperty
-    protected LocalDateTime localDateTime;
+    protected String localDateTime;
 
     @MetaProperty
     protected Double number;
@@ -130,19 +128,19 @@ public class RendererEntity extends BaseUuidEntity {
         this.html = html;
     }
 
-    public LocalDate getLocalDate() {
+    public String getLocalDate() {
         return localDate;
     }
 
-    public void setLocalDate(LocalDate localDate) {
+    public void setLocalDate(String localDate) {
         this.localDate = localDate;
     }
 
-    public LocalDateTime getLocalDateTime() {
+    public String getLocalDateTime() {
         return localDateTime;
     }
 
-    public void setLocalDateTime(LocalDateTime localDateTime) {
+    public void setLocalDateTime(String localDateTime) {
         this.localDateTime = localDateTime;
     }
 
